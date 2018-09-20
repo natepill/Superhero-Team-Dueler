@@ -122,13 +122,10 @@ class Team:
     def deal_damage(self, damage):
 
         hero_damage = damage//len(self.heroes)
-
-        for hero in self.heroes:
-            hero.health -= hero_damage
-
         num_hero_dead = 0
 
         for hero in self.heroes:
+            hero.health -= hero_damage
             if hero.health <= 0:
                 num_hero_dead += 1
 
@@ -158,18 +155,17 @@ class Team:
 
     def attack(self, other_team):
 
-        ''' NOT COMPLETE'''
+
         team_attack_strength = 0
         hero_kills = 0
 
         for hero in self.heroes:
             team_attack_strength += hero.attack()
 
-        other_team.defend(team_attack_strength)
+        hero_kills = other_team.defend(team_attack_strength)
 
         for hero in other_team.heroes:
-            if hero.health <= 0:
-                hero_kills += 1
+            hero.deaths = hero_kills
 
         for hero in self.heroes:
             hero.add_kill(hero_kills)
@@ -211,9 +207,6 @@ class Team:
         This method should update each hero when there is a team kill.
         """
 
-
-
-
 class Arena:
     def __init__(self):
         self.team_one = None
@@ -222,6 +215,7 @@ class Arena:
 
     def build_team_one(self):
         return create_team()
+
         """
         This method should allow a user to build team one.
         """
@@ -234,10 +228,41 @@ class Arena:
 
     def team_battle(self):
 
+        #TODO Make users choose a random number to choose who goes first. Could be every round.
         battling = True
         while battling == True:
             self.team_one.attack(self.team_two)
             self.team_two.attack(self.team_one)
+
+            winning_team = ""
+
+            team_one_isdead = False
+            team_two_isdead = False
+
+            team_one_deaths = 0
+            team_two_deaths = 0
+
+            for hero in team_one.heroes:
+                if hero.health <= 0:
+                    team_one_deaths += 1
+
+            for hero in team_two.heroes:
+                if hero.health <= 0:
+                    team_two_deaths += 1
+
+            if team_one_deaths == len(self.team_one.heroes):
+                team_one_isdead = True
+                winning_team = self.team_two.name
+
+            if team_two_deaths == len(self.team_one.heroes):
+                team_two_isdead = True
+                winning_team = self.team_one.name
+
+            if team_one_isdead == True or team_two_isdead == True:
+                battling = False
+
+        print("Congrats to {} for killing all of their opponents!".format(winning_team))
+
 
         """
         This method should continue to battle teams until
@@ -245,12 +270,34 @@ class Arena:
         """
 
     def show_stats(self):
+
+        print("Team One Statistics")
+        print(self.team_one.stats())
+
+        print("Team Two Statistics")
+        print(self.team_two.stats())
+
+
         """
         This method should print out the battle statistics
         including each heroes kill/death ratio.
         """
 
-    def create_team():
+    def is_team_dead(self, team):
+        heroes_dead = 0
+
+        for hero in self.heroes:
+            if hero.health <= 0:
+                heroes_dead += 1
+
+        if heroes_dead == len(team.heroes):
+            return True
+        else:
+            return False
+
+
+
+    def create_team(self):
 
         team_name = input("What will be the name of your team?")
         team = Team(team_name)
@@ -292,6 +339,5 @@ class Arena:
         building_team_finished = input("Are you done building {}? Enter (Y/N): ".format(team.name))
         if building_team_finished == "y" or "Y" or "Yes":
             building_team = False
-
 
         return team
