@@ -189,7 +189,7 @@ class Team:
     def stats(self):
 
         for hero in self.heroes:
-            print("{}:{}".format(self.kills, self.deaths))
+            print("{} : {}".format(hero.kills, hero.deaths))
 
         """
         This method should print the ratio of kills/deathss for each member of the team to the screen.
@@ -209,97 +209,14 @@ class Team:
 
 class Arena:
     def __init__(self):
-        self.team_one = None
-        self.team_two = None
+
+        self.team_one = self.build_team_one()
+        self.team_two = self.build_team_two()
 
 
     def build_team_one(self):
-        return create_team()
 
-        """
-        This method should allow a user to build team one.
-        """
-
-    def build_team_two(self):
-        return create_team()
-        """
-        This method should allow user to build team two.
-        """
-
-    def team_battle(self):
-
-        #TODO Make users choose a random number to choose who goes first. Could be every round.
-        battling = True
-        while battling == True:
-            self.team_one.attack(self.team_two)
-            self.team_two.attack(self.team_one)
-
-            winning_team = ""
-
-            team_one_isdead = False
-            team_two_isdead = False
-
-            team_one_deaths = 0
-            team_two_deaths = 0
-
-            for hero in team_one.heroes:
-                if hero.health <= 0:
-                    team_one_deaths += 1
-
-            for hero in team_two.heroes:
-                if hero.health <= 0:
-                    team_two_deaths += 1
-
-            if team_one_deaths == len(self.team_one.heroes):
-                team_one_isdead = True
-                winning_team = self.team_two.name
-
-            if team_two_deaths == len(self.team_one.heroes):
-                team_two_isdead = True
-                winning_team = self.team_one.name
-
-            if team_one_isdead == True or team_two_isdead == True:
-                battling = False
-
-        print("Congrats to {} for killing all of their opponents!".format(winning_team))
-
-
-        """
-        This method should continue to battle teams until
-        one or both teams are dead.
-        """
-
-    def show_stats(self):
-
-        print("Team One Statistics")
-        print(self.team_one.stats())
-
-        print("Team Two Statistics")
-        print(self.team_two.stats())
-
-
-        """
-        This method should print out the battle statistics
-        including each heroes kill/death ratio.
-        """
-
-    def is_team_dead(self, team):
-        heroes_dead = 0
-
-        for hero in self.heroes:
-            if hero.health <= 0:
-                heroes_dead += 1
-
-        if heroes_dead == len(team.heroes):
-            return True
-        else:
-            return False
-
-
-
-    def create_team(self):
-
-        team_name = input("What will be the name of your team?")
+        team_name = input("What will be the name of Team One? ")
         team = Team(team_name)
         print("Lets start adding heroes to {}!".format(team_name))
 
@@ -313,7 +230,56 @@ class Arena:
             building_abilities = True
             while building_abilities:
                 ability_name = input("Name of ability: ")
-                ability_attack_strength = input("What attack strength should {} have?".format(ability_name))
+                ability_attack_strength = input("What attack strength should {} have? ".format(ability_name))
+                new_ability = Ability(ability_name, ability_attack_strength)
+                new_hero.add_ability(new_ability)
+                abilities_finished = input("Add more abilities for {}? Enter (Y/N): ".format(new_hero.name))
+                if abilities_finished == "y" or "Y" or "Yes":
+                    building_abilities = False
+                else:
+                    continue
+            print("Now let's give {} some armor".format(new_hero.name))
+
+            building_armor = True
+            while building_armor:
+                armor_name = input("Name of armor: ")
+                armor_defense = input("Defense score: ")
+                new_armor = Armor(armor_name, armor_defense)
+                new_hero.add_armor(new_armor)
+                building_armor_finished = input("Add more armor for {}? Enter (Y/N): ".format(new_hero.name))
+                if building_armor_finished == "n" or "N" or "No":
+                    building_armor = False
+                else:
+                    team.add_hero(new_hero)
+
+
+            building_team_finished = input("Are you done building {}? Enter (Y/N): ".format(team.name))
+            if building_team_finished == "y" or "Y" or "Yes":
+                building_team = False
+
+        return team
+
+        """
+        This method should allow a user to build team one.
+        """
+
+    def build_team_two(self):
+
+        team_name = input("What will be the name of Team Two? ")
+        team = Team(team_name)
+        print("Lets start adding heroes to {}!".format(team_name))
+
+        building_team = True
+        while building_team:
+
+            hero_name = input("Hero's name: ")
+            new_hero = Hero(hero_name)
+            print("What abilities do you want {} to have? ".format(new_hero.name))
+            #while loop to enter in as many abilities as wanted
+            building_abilities = True
+            while building_abilities:
+                ability_name = input("Name of ability: ")
+                ability_attack_strength = input("What attack strength should {} have? ".format(ability_name))
                 new_ability = Ability(ability_name, ability_attack_strength)
                 new_hero.add_ability(new_ability)
                 abilities_finished = input("Add more abilities for {}? Enter (Y/N): ".format(new_hero.name))
@@ -333,11 +299,100 @@ class Arena:
                 if building_armor_finished == "y" or "Y" or "Yes":
                     building_armor = False
                 else:
-                    continue
-            team.add_hero(new_hero)
+                    team.add_hero(new_hero)
 
-        building_team_finished = input("Are you done building {}? Enter (Y/N): ".format(team.name))
-        if building_team_finished == "y" or "Y" or "Yes":
-            building_team = False
+
+            building_team_finished = input("Are you done building {}? Enter (Y/N): ".format(team.name))
+            if building_team_finished == "y" or "Y" or "Yes":
+                building_team = False
 
         return team
+
+    def team_battle(self):
+
+        #TODO Make users choose a random number to choose who goes first. Could be every round.
+        battling = True
+        while battling == True:
+            self.team_one.attack(self.team_two)
+            self.team_two.attack(self.team_one)
+
+            winning_team = ""
+            #
+            # team_one_isdead = False
+            # team_two_isdead = False
+            #
+            # team_one_deaths = 0
+            # team_two_deaths = 0
+            #
+            # for hero in team_one.heroes:
+            #     if hero.health <= 0:
+            #         team_one_deaths += 1
+            #
+            # for hero in team_two.heroes:
+            #     if hero.health <= 0:
+            #         team_two_deaths += 1
+            #
+            # if team_one_deaths == len(self.team_one.heroes):
+            #     team_one_isdead = True
+            #     winning_team = self.team_two.name
+            #
+            # if team_two_deaths == len(self.team_one.heroes):
+            #     team_two_isdead = True
+            #     winning_team = self.team_one.name
+
+            if self.is_team_dead(self.team_one) == True:
+                winning_team = self.team_two.name
+                print("Congrats to {} for killing all of their opponents!".format(winning_team))
+                batting = False
+                self.show_stats()
+                break
+            elif self.is_team_dead(self.team_two) == True:
+                winning_team = self.team_one.name
+                print("Congrats to {} for killing all of their opponents!".format(winning_team))
+                battling = False
+                self.show_stats()
+                break
+            else:
+                continue
+
+
+        """
+        This method should continue to battle teams until
+        one or both teams are dead.
+        """
+
+    def show_stats(self):
+
+        print("Team One Statistics")
+        print("---------------------")
+        print(self.team_one.stats())
+
+        print("Team Two Statistics")
+        print("---------------------")
+        print(self.team_two.stats())
+
+
+        """
+        This method should print out the battle statistics
+        including each heroes kill/death ratio.
+        """
+
+    def is_team_dead(self, team):
+        heroes_dead = 0
+
+        for hero in team.heroes:
+            if hero.health <= 0:
+                heroes_dead += 1
+
+        if heroes_dead == len(team.heroes):
+            return True
+        else:
+            return False
+
+
+def play_game():
+    game_arena = Arena()
+    game_arena.team_battle()
+
+
+play_game()
