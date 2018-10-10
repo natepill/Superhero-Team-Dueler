@@ -15,6 +15,7 @@ class Ability:
 
     def update_attack(self, attack_strength):
         self.attack_strength = attack_strength
+        #Instance of polymorphism 
 
 
 class Hero:
